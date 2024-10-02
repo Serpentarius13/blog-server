@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
     // Enable latest features
-    "lib": ["ESNext", "DOM"],
-    "module": "CommonJS",
+    "lib": ["ESNext"],
+    "module": "ESNext",
     "target": "ESNext",
 
     "esModuleInterop": true,
     "outDir": "./dist",
     "rootDir": ".",
     // Bundler mode
-    // "moduleResolution": "bundler",
-    // "verbatimModuleSyntax": true,
+    "moduleResolution": "bundler",
+    "verbatimModuleSyntax": true,
 
     // Best practices
     "strict": true,
@@ -21,5 +21,6 @@
     // "noUnusedLocals": false,
     // "noUnusedParameters": false,
     // "noPropertyAccessFromIndexSignature": false
-  }
+  },
+  "include": ["rollup.config.ts"]
 }
