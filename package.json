@@ -1,0 +1,14 @@
+{
+  "name": "personal-blog-server",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "pack": "bun build --target node --outdir ./dist index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
