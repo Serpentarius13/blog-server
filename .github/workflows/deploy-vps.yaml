@@ -1,8 +1,8 @@
-name: Deploy blog's server to vps
+name: Deploy blog's server to ssh
 
 on:
   push:
-    branches: [master]
+    branches: [main]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -58,13 +58,23 @@ jobs:
           name: build-${{github.ref_name}}-${{github.sha}}
           path: dist
 
-      - name: Exec ssh
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Deploy artifact
+        uses: burnett01/rsync-deployments@7.0.1
         with:
-          host: ${{ secrets.DEPLOY_HOSTNAME }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_KEY }}
-          script: |
-            cd app
-            git pull
-            pm2 restart server
+          switches: -avzr --delete
+          path: dist
+          remote_path: /app
+          remote_host: ${{ secrets.DEPLOY_HOSTNAME }}
+          remote_user: ${{ secrets.DEPLOY_USER }}
+          remote_key: ${{ secrets.DEPLOY_KEY }}
+
+      # - name: Exec ssh
+      #   uses: appleboy/ssh-action@v1.0.3
+      #   with:
+      #     host: ${{ secrets.DEPLOY_HOSTNAME }}
+      #     username: ${{ secrets.DEPLOY_USER }}
+      #     key: ${{ secrets.DEPLOY_KEY }}
+      #     script: |
+      #       cd app
+      #       git pull
+      #       pm2 restart server
