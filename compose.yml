@@ -1,12 +1,14 @@
 services:
   express:
     build:
+      context: .
       dockerfile: Dockerfile-back
     ports:
       - "3000:3000"
 
   nginx:
     build:
+      context: .
       dockerfile: Dockerfile-nginx
     depends_on:
       - express
