@@ -8,7 +8,7 @@ const config: RollupOptions = {
   input: "index.ts",
 
   output: {
-    file: "dist/index.js",
+    file: "dist/index.cjs",
     format: "cjs",
   },
 

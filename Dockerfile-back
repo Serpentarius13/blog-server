@@ -1,0 +1,13 @@
+FROM oven/bun:latest as builder
+
+WORKDIR /app 
+
+COPY bun.lockb package.json ./
+
+RUN bun install 
+
+COPY . .
+
+RUN bun pack
+
+CMD ["node", "dist/index.cjs"]

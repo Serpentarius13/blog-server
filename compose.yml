@@ -1,0 +1,14 @@
+services:
+  express:
+    build:
+      dockerfile: Dockerfile-back
+    ports:
+      - "3000:3000"
+
+  nginx:
+    build:
+      dockerfile: Dockerfile-nginx
+    depends_on:
+      - express
+    ports:
+      - "80:80"

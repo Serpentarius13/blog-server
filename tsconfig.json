@@ -6,7 +6,7 @@
     "target": "ESNext",
 
     "esModuleInterop": true,
-    "outDir": "./dist",
+    "outDir": "dist",
     "rootDir": ".",
     // Bundler mode
     "moduleResolution": "bundler",
