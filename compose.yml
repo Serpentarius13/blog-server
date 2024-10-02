@@ -14,5 +14,6 @@ services:
       - express
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt
