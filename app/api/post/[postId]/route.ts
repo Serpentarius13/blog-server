@@ -17,14 +17,14 @@ export async function GET(
 
     const { postId } = paramsParsed.data;
 
-    const post = (await postsApi.getPost(postId).catch(() => {
-      return {
+    const post =
+      (await postsApi.getPost(postId)) ??
+      ({
         id: postId,
         reads: 0,
         views: 1,
         likes: 0,
-      };
-    })) satisfies Post;
+      } satisfies Post);
     return new Response(JSON.stringify({ post }));
   } catch (error) {
     console.log(error);

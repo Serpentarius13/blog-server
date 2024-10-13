@@ -28,8 +28,13 @@ const updatePost = async (post: Prisma.PostUpdateInput) => {
   );
 };
 
+const getAllPosts = async () => {
+  return (await db.query(`SELECT * FROM posts`)).rows as Post[];
+};
+
 export const postsApi = {
   createPost,
   getPost,
   updatePost,
+  getAllPosts,
 } as const;
