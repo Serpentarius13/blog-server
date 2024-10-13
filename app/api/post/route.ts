@@ -1,7 +1,6 @@
 import { postsApi } from "@/db/post";
 import { PostAction, postActionSchema } from "@/lib/schemas";
 import { Post } from "@prisma/client";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 const incFieldsSchema: Record<PostAction, keyof Omit<Post, "id">> = {
   [PostAction.READ]: "reads",
@@ -15,20 +14,24 @@ export async function POST(request: Request) {
     const body = await postActionSchema.safeParseAsync(await request.json());
     if (!body.success)
       return new Response(JSON.stringify(body.error.issues), { status: 400 });
+
     const post = await postsApi
-      .updatePost({
-        [incFieldsSchema[body.data.action]]: 1,
-      })
+      .updatePost(
+        {
+          [incFieldsSchema[body.data.action]]: 1,
+        },
+        body.data.postId
+      )
       .catch(async (err) => {
-        if (
-          err instanceof PrismaClientKnownRequestError &&
-          err.code === "P2025"
-        ) {
+        if (err.code === "23505") {
           await postsApi.createPost({
             id: body.data.postId,
             [incFieldsSchema[body.data.action]]: 1,
           });
+          return;
         }
+
+        console.log(err);
       });
 
     return new Response(
