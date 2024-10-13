@@ -10,7 +10,7 @@ const incFieldsSchema: Record<PostAction, keyof Omit<Post, "id">> = {
 };
 
 export const dynamic = "force-dynamic"; // defaults to auto
-export async function PATCH(request: Request) {
+export async function POST(request: Request) {
   try {
     const body = await postActionSchema.safeParseAsync(await request.json());
     if (!body.success)
