@@ -19,20 +19,21 @@ export async function PATCH(request: Request) {
       .updatePost({
         [incFieldsSchema[body.data.action]]: 1,
       })
-      .catch((err) => {
+      .catch(async (err) => {
         if (
           err instanceof PrismaClientKnownRequestError &&
           err.code === "P2025"
         ) {
-          return postsApi.createPost({
+          await postsApi.createPost({
             id: body.data.postId,
             [incFieldsSchema[body.data.action]]: 1,
           });
         }
-
-        console.log(err);
       });
-    return new Response(JSON.stringify({ post }));
+
+    return new Response(
+      JSON.stringify(post ? { post } : { error: "Post not found" })
+    );
   } catch (error) {
     console.log(error);
     return new Response(JSON.stringify({ error: error.message }));
