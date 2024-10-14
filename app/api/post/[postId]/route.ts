@@ -1,6 +1,5 @@
 import { postsApi } from "@/db/post";
 import { postQuerySchema } from "@/lib/schemas";
-import { Post } from "@prisma/client";
 
 export const dynamic = "force-dynamic"; // defaults to auto
 export async function GET(
@@ -17,14 +16,8 @@ export async function GET(
 
     const { postId } = paramsParsed.data;
 
-    const post =
-      (await postsApi.getPost(postId)) ??
-      ({
-        id: postId,
-        reads: 0,
-        views: 1,
-        likes: 0,
-      } satisfies Post);
+    const post = await postsApi.getPostOrDefault(postId);
+
     return new Response(JSON.stringify({ post }));
   } catch (error) {
     console.log(error);

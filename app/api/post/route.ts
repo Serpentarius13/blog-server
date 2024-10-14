@@ -15,27 +15,26 @@ export async function POST(request: Request) {
     if (!body.success)
       return new Response(JSON.stringify(body.error.issues), { status: 400 });
 
-    const post = await postsApi
-      .updatePost(
-        {
-          [incFieldsSchema[body.data.action]]: 1,
-        },
-        body.data.postId
-      )
-      .then(async (res) => {
-        if (!res) {
-          await postsApi.createPost({
-            id: body.data.postId,
-            [incFieldsSchema[body.data.action]]: 1,
-          });
-          return;
-        }
-        return res;
+    const { postId, action } = body.data;
+
+    const dbPost = await postsApi.getPost(postId);
+
+    if (!dbPost) {
+      const post = await postsApi.createPost({
+        id: postId,
+        views: 1,
+        [incFieldsSchema[action]]: 1,
       });
 
-    return new Response(
-      JSON.stringify(post ? { post } : { error: "Post not found" })
+      return new Response(JSON.stringify({ post }));
+    }
+
+    const post = await postsApi.incrementPostField(
+      postId,
+      incFieldsSchema[action]
     );
+
+    return new Response(JSON.stringify({ post }));
   } catch (error) {
     console.log(error);
     return new Response(JSON.stringify({ error: error.message }));

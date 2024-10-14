@@ -1,43 +1,66 @@
-import { Post, Prisma } from "@prisma/client";
+import { Insertable, Updateable } from "kysely";
 import { db } from ".";
+import { Post } from "./schema";
 
-const createPost = async (post: Prisma.PostCreateInput) => {
-  return (
-    await db.query(
-      `INSERT INTO posts (${Object.keys(post).join(
-        ", "
-      )}) VALUES (${Object.values(post).map(
-        (value, index) => `$${index + 1}`
-      )}) RETURNING *`,
-      Object.values(post)
-    )
-  ).rows as Post[];
+const createPost = async (post: Insertable<Post>) => {
+  return db.insertInto("posts").values(post).returningAll().executeTakeFirst();
 };
 
 const getPost = async (postId: string) => {
-  return (await db.query(`SELECT * FROM posts WHERE id = $1`, [postId]))
-    .rows[0] as Post;
+  return db
+    .selectFrom("posts")
+    .selectAll()
+    .where("id", "=", postId)
+    .executeTakeFirst();
 };
 
-const updatePost = async (post: Prisma.PostUpdateInput, postId: string) => {
-  return (
-    await db.query(
-      `UPDATE posts SET ${Object.keys(post)
-        .map((key, ix) => `${key} = $${ix + 1}`)
-        .join(", ")} WHERE id = $${Object.values(post).length + 1}
-      RETURNING *`,
-      [...Object.values(post), postId]
-    )
-  ).rows[0];
+const getPostOrDefault = async (postId: string) => {
+  return db
+    .selectFrom("posts")
+    .selectAll()
+    .where("id", "=", postId)
+    .executeTakeFirst()
+    .then((res) => {
+      return (
+        res ?? {
+          id: postId,
+          reads: 0,
+          views: 1,
+          likes: 0,
+        }
+      );
+    });
+};
+
+const updatePost = async (post: Updateable<Post>, postId: string) => {
+  return db
+    .updateTable("posts")
+    .set(post)
+    .where("id", "=", postId)
+    .returningAll()
+    .executeTakeFirst();
 };
 
 const getAllPosts = async () => {
-  return (await db.query(`SELECT * FROM posts`)).rows as Post[];
+  return db.selectFrom("posts").selectAll().execute();
+};
+
+const incrementPostField = async (postId: string, field: keyof Post) => {
+  return db
+    .updateTable("posts")
+    .where("id", "=", postId)
+    .set((eb) => ({
+      [field]: eb(`posts.${field}`, "+", 1),
+    }))
+    .returningAll()
+    .executeTakeFirst();
 };
 
 export const postsApi = {
   createPost,
   getPost,
+  getPostOrDefault,
   updatePost,
   getAllPosts,
+  incrementPostField,
 } as const;

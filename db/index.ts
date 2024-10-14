@@ -1,8 +1,13 @@
+import { Kysely, PostgresDialect } from "kysely";
 import { Pool } from "pg";
+import { DB } from "./schema"; // this is the Database interface we defined earlier
 
-export const db = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+const dialect = new PostgresDialect({
+  pool: new Pool({
+    connectionString: process.env.DATABASE_URL,
+  }),
+});
+
+export const db = new Kysely<DB>({
+  dialect,
 });
