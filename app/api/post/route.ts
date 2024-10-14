@@ -22,16 +22,15 @@ export async function POST(request: Request) {
         },
         body.data.postId
       )
-      .catch(async (err) => {
-        if (err.code === "23505") {
+      .then(async (res) => {
+        if (!res) {
           await postsApi.createPost({
             id: body.data.postId,
             [incFieldsSchema[body.data.action]]: 1,
           });
           return;
         }
-
-        console.log(err);
+        return res;
       });
 
     return new Response(
